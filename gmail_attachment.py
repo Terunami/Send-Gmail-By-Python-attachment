@@ -73,7 +73,7 @@ def create_message(mail_from,mail_to,subject,str_message,file_attach):
 #
 # ------------------------------------------------------------------
 # [6]:
-def gmail_attachement_proc(mail_from,mail_to,subject,str_message,file_attach,flags):
+def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach,flags):
     credentials = get_credentials_proc(flags)
     http = credentials.authorize(httplib2.Http())
     service = apiclient.discovery.build("gmail", "v1", http=http)

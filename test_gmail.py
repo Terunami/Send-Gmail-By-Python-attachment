@@ -9,7 +9,7 @@ import sys
 import argparse
 import oauth2client
 
-from gmail_attachement import gmail_attachement_proc 
+from gmail_attachment import gmail_attachment_proc 
 
 flags = argparse.ArgumentParser(
     parents=[oauth2client.tools.argparser]
@@ -26,14 +26,13 @@ str_message = ""
 str_message += "こんにちは。\n"
 str_message += "Jan/03/2019 PM 20:45\n"
 #
-file_attach = "federer.png"
-file_attach = "in01.csv"
-file_attach = "example01.pdf"
-file_attach = "federer.jpg"
+file_attach = "text1.txt"
+file_attach = "text3.csv"
+file_attach = "text1.txt.zip"
 #
 sys.stderr.write("file_attach = " + file_attach + "\n")
 #
-gmail_attachement_proc(mail_from,mail_to,subject,str_message,file_attach,flags)
+gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach,flags)
 #
 sys.stderr.write("*** 終了 ***\n")
 # ------------------------------------------------------------------
