@@ -1,7 +1,6 @@
 #
 #   gmail_attachement.py
 #
-#                   Jan/03/2019
 # ------------------------------------------------------------------
 import httplib2
 import os
@@ -42,7 +41,7 @@ def attach_application_proc(message,data_attach,filename,subtype):
     return message
 # ------------------------------------------------------------------
 # [6-8]:
-def create_message(mail_from,mail_to,subject,str_message,file_attach_list):
+def create_message(mail_from,mail_to,mail_cc,mail_bcc,subject,str_message,file_attach_list):
     message = EmailMessage()
     message.set_content(str_message)
 #
@@ -50,6 +49,9 @@ def create_message(mail_from,mail_to,subject,str_message,file_attach_list):
     message["To"] = mail_to
     message["Subject"] = subject
     message["Date"] = formatdate(localtime=True)
+
+    message["Cc"] = mail_cc
+    message["Bcc"] = mail_bcc
 
     message = attachment_message(message, file_attach_list)
 #
@@ -61,7 +63,7 @@ def create_message(mail_from,mail_to,subject,str_message,file_attach_list):
 #
 # ------------------------------------------------------------------
 # [6]:
-def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach_list,flags):
+def gmail_attachment_proc(mail_from,mail_to,mail_cc,mail_bcc,subject,str_message,file_attach_list,flags):
     credentials = get_credentials_proc(flags)
     http = credentials.authorize(httplib2.Http())
     service = apiclient.discovery.build("gmail", "v1", http=http)
@@ -69,7 +71,7 @@ def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach_list
     try:
         result = service.users().messages().send(
             userId=mail_from,
-            body=create_message(mail_from,mail_to,subject,str_message,file_attach_list)
+            body=create_message(mail_from,mail_to,mail_cc,mail_bcc,subject,str_message,file_attach_list)
         ).execute()
 
         print("Message Id: {}".format(result["id"]))
