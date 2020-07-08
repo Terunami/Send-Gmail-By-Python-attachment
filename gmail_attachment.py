@@ -42,7 +42,7 @@ def attach_application_proc(message,data_attach,filename,subtype):
     return message
 # ------------------------------------------------------------------
 # [6-8]:
-def create_message(mail_from,mail_to,subject,str_message,file_attach):
+def create_message(mail_from,mail_to,subject,str_message,file_attach_list):
     message = EmailMessage()
     message.set_content(str_message)
 #
@@ -50,20 +50,8 @@ def create_message(mail_from,mail_to,subject,str_message,file_attach):
     message["To"] = mail_to
     message["Subject"] = subject
     message["Date"] = formatdate(localtime=True)
-#
-    fp = open(file_attach,'rb')
-    img_data = fp.read()
-    fp.close()
-#
-    for suffix in [".pdf",".csv",".json",".xlsx",".zip"]:
-        if (file_attach.endswith(suffix)):
-            message = attach_application_proc \
-                (message,img_data,file_attach,suffix)
-#
-    for suffix in [".jpg",".png"]:
-        if (file_attach.endswith(suffix)):
-            message = attach_image_proc \
-                (message,img_data,file_attach)
+
+    message = attachment_message(message, file_attach_list)
 #
     byte_msg = message.as_string().encode(encoding="UTF-8")
     byte_msg_b64encoded = base64.urlsafe_b64encode(byte_msg)
@@ -73,7 +61,7 @@ def create_message(mail_from,mail_to,subject,str_message,file_attach):
 #
 # ------------------------------------------------------------------
 # [6]:
-def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach,flags):
+def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach_list,flags):
     credentials = get_credentials_proc(flags)
     http = credentials.authorize(httplib2.Http())
     service = apiclient.discovery.build("gmail", "v1", http=http)
@@ -81,7 +69,7 @@ def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach,flag
     try:
         result = service.users().messages().send(
             userId=mail_from,
-            body=create_message(mail_from,mail_to,subject,str_message,file_attach)
+            body=create_message(mail_from,mail_to,subject,str_message,file_attach_list)
         ).execute()
 
         print("Message Id: {}".format(result["id"]))
@@ -92,3 +80,22 @@ def gmail_attachment_proc(mail_from,mail_to,subject,str_message,file_attach,flag
         print("------end trace------")
 #
 # ------------------------------------------------------------------
+
+def attachment_message(message, file_attach_list):
+    for file_attach in file_attach_list:
+        fp = open(file_attach,'rb')
+        img_data = fp.read()
+        fp.close()
+    #
+        for suffix in [".txt",".pdf",".csv",".json",".xlsx",".zip"]:
+            if (file_attach.endswith(suffix)):
+                message = attach_application_proc \
+                    (message,img_data,file_attach,suffix)
+    #
+        for suffix in [".jpg",".png"]:
+            if (file_attach.endswith(suffix)):
+                message = attach_image_proc \
+                    (message,img_data,file_attach)
+    return message
+
+    
